@@ -13,23 +13,10 @@ The game rules are simple - try to paint as much territory as possible until tim
 
 ## CSE 110 - Bug Description
 
-### Prerequisite
-
-- Install [VSCode](https://code.visualstudio.com/).
-- Install the [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension in VS Code.
-  - You will also need to set up Docker to use Dev Container. Please follow the [instructions here](https://code.visualstudio.com/docs/devcontainers/containers#_installation).
-  - If you are using Windows/Mac OS, installing the [Docker Desktop](https://www.docker.com/products/docker-desktop/) _should_ be enough.
-- (Optional, but saves you from manually cloning the repo) Install the [GitHub Classroom](https://marketplace.visualstudio.com/items?itemName=GitHub.classroom) extension in VS Code.
-
 ### To run:
 
-1. If you installed the extension "GitHub Classroom", click the "Open in VSCode" code at the top of this repo. Skip to 4.
-2. If not, manually clone this repository using `git`.
-3. Open the cloned local repository using VSCode.
-4. You should see a pop-up in the lower right corner prompting you to "reopen in dev container". Click that.
-   - If you do not see the pop-up. Press "Ctrl/Command + Shift + P" and type "Dev Container: Reopen in Container" and select that option.
-5. Wait for the container to build, which will automatically set up the required dependencies for the project.
-6. When the build finishes, run `npm start` to start the dev server. GLHF : )
+1. Wait until you see a message in the terminal along the lines of "Welcome to Codespaces! You are on a custom image defined in your devcontainer.json file."
+2. When the build finishes, run `npm start` to start the dev server. You should see the web app opening. GLHF : )
 
 ### Task description:
 As shown in the video above, there are multiple players that compete in covering more space in there colors by making quadrilateral shapes. There is a bar that represents the proportion of the canvas the players have covered. However, this bar is currently not presenting the proportions correctly. Your task is to identify the code relevant to the bug, and attempt to find a fix.

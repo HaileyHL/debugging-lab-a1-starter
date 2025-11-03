@@ -1,0 +1,18 @@
+{
+"workbench.startupEditor": "none",
+  "extensions.ignoreRecommendations": true,
+
+  "java.project.referencedLibraries": [],
+  "java.configuration.updateBuildConfiguration": "disabled",
+
+  "editor.inlayHints.enabled": "off",
+  "editor.lightbulb.enabled": "off",
+  "editor.quickSuggestions": {
+    "other": false,
+    "comments": false,
+    "strings": false
+  },
+  "github.copilot.enable": {
+    "*": false
+    }
+}
