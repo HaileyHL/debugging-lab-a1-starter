@@ -34,6 +34,14 @@ The game rules are simple - try to paint as much territory as possible until tim
 ### Task description:
 As shown in the video above, there are multiple players that compete in covering more space in there colors by making quadrilateral shapes. There is a bar that represents the proportion of the canvas the players have covered. However, this bar is currently not presenting the proportions correctly. Your task is to identify the code relevant to the bug, and attempt to find a fix.
 
+### To submit:
+Run the following commands line by line to commit and push all your changes (or use the sidebar):
+```
+$ git add .
+$ git commit
+$ git push
+```
+
 
 ## Libriaries and dependencies
 
