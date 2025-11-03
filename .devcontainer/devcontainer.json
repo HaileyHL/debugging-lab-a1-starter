@@ -8,9 +8,6 @@
     }
   },
   "postCreateCommand": "npm install",
-  "postAttachCommand": {
-    "server": "npm start"
-  },
   "customizations": {
     "vscode": {
       "settings": {
