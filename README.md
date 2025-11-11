@@ -19,6 +19,7 @@ You are the green user (top left corner) on the screen. You can play by pressing
 
 1. Wait until you see a message in the terminal along the lines of "Welcome to Codespaces! You are on a custom image defined in your devcontainer.json file."
 2. When the build finishes, run `npm start` to start the dev server. You should see the web app opening!
+3. If you see a TypeError page upon opening the web app, you can ignore it by closing the page. You should still be able to play the game and debug the issue.
 
 ### Task description:
 As shown in the video above, there are multiple players that compete in covering more space in there colors by making quadrilateral shapes. There is a bar that represents the proportion of the canvas the players have covered. However, this bar is currently not presenting the proportions correctly. Your task is to identify the code relevant to the bug, and attempt to find a fix.
