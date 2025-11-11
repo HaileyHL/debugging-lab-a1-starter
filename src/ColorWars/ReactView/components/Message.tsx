@@ -6,6 +6,13 @@ import { COLORS, createHistogram, getFontSize } from "../../utils/functions";
 import { Component } from "react";
 import { Point, Player } from "../../utils/objectTypes";
 
+/**
+ * Props for the EndGame/Message overlay component.
+ * - state: current game state (e.g. 'endGame', 'paused', 'initializing')
+ * - fields: board state used to compute the histogram/winner
+ * - players: list of players used to map histogram color to player info
+ * - mobile: numeric flag indicating if mobile/touch controls are enabled
+ */
 export interface Props {
   state: string;
   fields: number[][];
@@ -13,6 +20,13 @@ export interface Props {
   mobile: number;
 }
 
+/**
+ * EndGame (Message) overlay
+ *
+ * Displays a semi-transparent overlay with a title and contextual instruction text.
+ * It computes the winner using a histogram of field ownership and adjusts copy for
+ * mobile vs keyboard controls. Drawing is performed with react-konva primitives.
+ */
 class EndGame extends Component<Props, object> {
   canvasDim: Point = { X: 0, Y: 0 };
   winner: string | undefined = "no one";
@@ -21,6 +35,12 @@ class EndGame extends Component<Props, object> {
   text: string = "0";
   subText: string = "0";
 
+  /**
+   * componentDidMount
+   * - Captures the current stage size to position the overlay.
+   * - Computes the histogram to determine the winning color/player.
+   * - Sets main and sub text depending on game state and input mode (mobile vs keyboard).
+   */
   componentDidMount() {
     var stage = this.layer.getStage() as Stage;
     this.canvasDim = { X: stage.width(), Y: stage.height() };
@@ -29,7 +49,7 @@ class EndGame extends Component<Props, object> {
     ({ colorsArr } = createHistogram(this.props.fields));
     this.color = COLORS[colorsArr[0]];
 
-    let winner = this.props.players.filter(p => p.color === colorsArr[0])[0];
+    let winner = this.props.players.filter((p) => p.color === colorsArr[0])[0];
     this.winner = winner.name;
 
     this.subText = this.props.mobile === 0 ? "Press space to" : "Tap screen to";
@@ -48,13 +68,14 @@ class EndGame extends Component<Props, object> {
       this.subText += " continue";
     }
 
+    // Force an update to ensure the computed text and layout are rendered.
     this.forceUpdate();
   }
 
   render() {
     return (
       <Layer
-        ref={c => {
+        ref={(c) => {
           this.layer = c;
         }}
       >
@@ -102,7 +123,11 @@ class EndGame extends Component<Props, object> {
       </Layer>
     );
   }
-
+  /**
+   * drawTitle
+   * - Renders the top title label only when the component is in the 'initializing' state.
+   * - Kept as a separate method to keep render() concise.
+   */
   drawTitle() {
     if (this.props.state === "initializing") {
       return (

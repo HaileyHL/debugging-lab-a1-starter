@@ -9,6 +9,13 @@ import Players from "../../ReduxStore/containers/Players";
 import Fieldsx from "../../ReduxStore/containers/Fields";
 import { getDimensionForGameBoard } from "../../utils/functions";
 
+/**
+ * Props for GameBoard
+ * - dim: logical board dimensions
+ * - gameState: current game state string used to decide overlays
+ * - touchscreen: whether touchscreen controls are enabled (non-zero)
+ * - tick: current game tick (unused here but passed through props)
+ */
 export interface Props {
   dim: Point;
   gameState: string;
@@ -16,9 +23,20 @@ export interface Props {
   tick: number;
 }
 
+/**
+ * GameBoard component
+ *
+ * Responsible for laying out the Konva Stage that contains the game layers (fields, tails, players)
+ * and for conditionally rendering overlays such as the message and touchscreen controls.
+ */
 class GameBoard extends React.Component<Props, object> {
+  // Cached pixel dimensions for the Konva stage computed from logical board size and UI mode.
   canvDim: Point = { X: 0, Y: 0 };
 
+  /**
+   * Render the main Stage and core layers. Computes the canvas dimensions each render
+   * so the Stage always matches the expected layout for the current device/mode.
+   */
   render() {
     this.canvDim = getDimensionForGameBoard(
       this.props.dim,
@@ -42,6 +60,10 @@ class GameBoard extends React.Component<Props, object> {
     );
   }
 
+  /**
+   * Conditionally render the central Message overlay when the game is paused, initializing,
+   * or finished. Keeps decision logic separated from render() for readability.
+   */
   renderMessage() {
     if (
       this.props.gameState === "endGame" ||
@@ -53,6 +75,10 @@ class GameBoard extends React.Component<Props, object> {
     return null;
   }
 
+  /**
+   * Conditionally render touchscreen controls when touchscreen mode is enabled.
+   * Extracted as a method to keep the JSX in render() concise.
+   */
   renderTouchScreen() {
     if (this.props.touchscreen !== 0) {
       return <TouchScreen />;

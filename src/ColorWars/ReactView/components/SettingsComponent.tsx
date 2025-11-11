@@ -1,9 +1,9 @@
-import PlayersSettings from '../../ReduxStore/containers/PlayersSettings';
-import 'rc-slider/assets/index.css';
-import '../../Settings.css';
-import * as actions from '../../ReduxStore/actionTypes';
+import PlayersSettings from "../../ReduxStore/containers/PlayersSettings";
+import "rc-slider/assets/index.css";
+import "../../Settings.css";
+import * as actions from "../../ReduxStore/actionTypes";
 
-import * as React from 'react';
+import * as React from "react";
 import {
   FormControl,
   Button,
@@ -12,12 +12,22 @@ import {
   DropdownButton,
   MenuItem,
   Form,
-  FormGroup
-} from 'react-bootstrap';
+  FormGroup,
+} from "react-bootstrap";
 
-import { Point } from '../../utils/objectTypes';
-import { FRAMES_PER_SEC } from '../../utils/functions';
+import { Point } from "../../utils/objectTypes";
+import { FRAMES_PER_SEC } from "../../utils/functions";
 
+/**
+ * Props for SettingsComponent
+ * - visible: whether settings panel is visible
+ * - dimension: current board dimension
+ * - startingTerritory, endTime: game configuration values
+ * - optimized: rendering optimization flag
+ * - phase: current game phase (used for pause/resume behavior)
+ * - touch: touchscreen mode flag
+ * - on* callbacks: action dispatchers for various settings changes
+ */
 export interface Props {
   visible: boolean;
   dimension: Point;
@@ -38,9 +48,14 @@ export interface Props {
 }
 
 class SettingsComponent extends React.Component<Props, object> {
+  // bounds enforced for numeric input fields
   maxBoard: number = 100;
   minBoard: number = 3;
 
+  /**
+   * Render the settings panel or a hidden placeholder depending on visibility.
+   * This method composes the whole settings UI and wires callbacks to controls.
+   */
   render() {
     if (!this.props.visible) {
       return <div className="HiddenSettings" />;
@@ -73,7 +88,7 @@ class SettingsComponent extends React.Component<Props, object> {
             <div className="SettingsGroup">
               <ButtonToolbar>
                 <Button onClick={this.onPauseResume}>
-                  {this.props.phase === 'paused' ? 'resume game' : 'pause game'}
+                  {this.props.phase === "paused" ? "resume game" : "pause game"}
                 </Button>
 
                 <Button
@@ -91,8 +106,8 @@ class SettingsComponent extends React.Component<Props, object> {
                 <FormGroup>
                   <ControlLabel>game time(in seconds)</ControlLabel>
                   <FormControl
-                    type={'number'}
-                    placeholder={'game time(in seconds)'}
+                    type={"number"}
+                    placeholder={"game time(in seconds)"}
                     value={(this.props.endTime / FRAMES_PER_SEC).toString()}
                     onChange={this.onChangeGameTime}
                   />
@@ -100,8 +115,8 @@ class SettingsComponent extends React.Component<Props, object> {
                 <FormGroup>
                   <ControlLabel>starting territory size</ControlLabel>
                   <FormControl
-                    type={'number'}
-                    placeholder={'starting territory size'}
+                    type={"number"}
+                    placeholder={"starting territory size"}
                     value={this.props.startingTerritory.toString()}
                     onChange={this.onChangeStartTerritory}
                   />
@@ -115,8 +130,8 @@ class SettingsComponent extends React.Component<Props, object> {
               <FormGroup>
                 <ControlLabel>width</ControlLabel>
                 <FormControl
-                  type={'number'}
-                  placeholder={'width'}
+                  type={"number"}
+                  placeholder={"width"}
                   min={this.minBoard}
                   max={this.maxBoard}
                   value={this.props.dimension.X}
@@ -126,8 +141,8 @@ class SettingsComponent extends React.Component<Props, object> {
               <FormGroup>
                 <ControlLabel>height</ControlLabel>
                 <FormControl
-                  type={'number'}
-                  placeholder={'height'}
+                  type={"number"}
+                  placeholder={"height"}
                   min={this.minBoard}
                   max={this.maxBoard}
                   value={this.props.dimension.Y}
@@ -142,12 +157,15 @@ class SettingsComponent extends React.Component<Props, object> {
     }
   }
 
+  /**
+   * Conditionally render touchscreen-specific options when touch mode is enabled.
+   */
   renderTouchscreenSettings() {
     if (this.props.touch !== 0) {
       return (
         <DropdownButton
-          title={'Touchscreen mode'}
-          id={'touch-dropdown'}
+          title={"Touchscreen mode"}
+          id={"touch-dropdown"}
           onSelect={this.onTouch}
         >
           <MenuItem eventKey={1}>Relative directions</MenuItem>
@@ -159,42 +177,66 @@ class SettingsComponent extends React.Component<Props, object> {
     return null;
   }
 
+  /**
+   * Toggle optimized rendering flag.
+   */
   onOptimizedChange = () => {
     this.props.onOptimization(!this.props.optimized);
   };
 
+  /**
+   * Handle changes to the number of columns (width). Clips input and dispatches resize.
+   */
   changeRows = (e: any) => {
     let val = clipMapDim(e.target.value);
     this.props.onResizeBoard({
       X: val,
-      Y: this.props.dimension.Y
+      Y: this.props.dimension.Y,
     });
   };
 
+  /**
+   * Handle changes to the number of rows (height). Clips input and dispatches resize.
+   */
   changeCols = (e: any) => {
     let val = clipMapDim(e.target.value);
     this.props.onResizeBoard({
       X: this.props.dimension.X,
-      Y: val
+      Y: val,
     });
   };
 
+  /**
+   * Convert seconds input to frames and update game time.
+   */
   onChangeGameTime = (e: any) => {
     this.props.onChangeGameTime(e.target.value * FRAMES_PER_SEC);
   };
 
+  /**
+   * Update starting territory size.
+   */
   onChangeStartTerritory = (e: any) => {
     this.props.onChangeStartTerritory(e.target.value);
   };
 
+  /**
+   * Delegate map template selection to the parent handler.
+   */
   onTemplateChange = (e: any) => {
     return this.props.onTemplateChange(e);
   };
 
+  /**
+   * Delegate touchscreen mode selection to the parent handler.
+   */
   onTouch = (e: any) => {
     return this.props.onTouchChange(e);
   };
 
+  /**
+   * Pause or resume the game depending on the current phase.
+   */
   onPauseResume = (e: any) => {
     if (this.props.phase === 'paused') {
       this.props.onResumeGame();
@@ -206,6 +248,9 @@ class SettingsComponent extends React.Component<Props, object> {
 
 export default SettingsComponent;
 
+/**
+ * Clip map dimension to a sensible integer range for input controls.
+ */
 function clipMapDim(dim: number): number {
   return Math.round(Math.max(Math.min(dim, 200), 1));
 }

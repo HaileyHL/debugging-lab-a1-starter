@@ -16,7 +16,14 @@ export interface Props {
   onRestart: () => actions.CreateBoard;
   onResume: () => actions.Resume;
 }
-
+/**
+ * TouchScreen
+ *
+ * Handles touch-driven input modes for directing the player. Supports multiple
+ * interaction modes (relative, absolute, following) and exposes small UI helpers
+ * rendered on a Konva layer to indicate control regions. The component drives
+ * player direction updates by calling the provided `onPlayerModify` callback.
+ */
 class TouchScreen extends React.Component<Props> {
   stage: Stage = undefined as any;
   directing: boolean = false;
@@ -27,6 +34,10 @@ class TouchScreen extends React.Component<Props> {
     super(props);
   }
 
+  /**
+   * Setup: capture the stage reference, size the interaction rect, and attach
+   * touchstart/touchend listeners to control whether we're currently directing.
+   */
   componentDidMount() {
     let rect: any = this.refs.rect;
     this.stage = rect.getStage();
@@ -45,6 +56,9 @@ class TouchScreen extends React.Component<Props> {
     this.forceUpdate();
   }
 
+  /**
+   * If the game is ended/paused/initializing, trigger the appropriate resume/restart action.
+   */
   playAgain() {
     if (this.props.phase === "endGame") {
       this.props.onRestart();
@@ -59,6 +73,10 @@ class TouchScreen extends React.Component<Props> {
     }
   }
 
+  /**
+   * When new props arrive, if the user is currently touching the screen continue
+   * directing the player; otherwise reset the tapped state.
+   */
   componentWillReceiveProps() {
     if (this.directing) {
       this.directPlayer();
@@ -67,6 +85,10 @@ class TouchScreen extends React.Component<Props> {
     }
   }
 
+  /**
+   * Only re-render when the input mode changes. Otherwise we rely on Konva layer
+   * updates and callbacks to update visuals and game state.
+   */
   shouldComponentUpdate(nextProps: Props) {
     if (this.props.mode === nextProps.mode) {
       return false;
@@ -74,15 +96,21 @@ class TouchScreen extends React.Component<Props> {
     return true;
   }
 
+  /**
+   * Render the Konva helpers and an invisible Rect used to capture touch events.
+   */
   render() {
     return (
       <ReactKonva.Layer>
         {this.renderTouchHelpers()}
-        <ReactKonva.Rect ref={el => (this.myRef = el)} />
+        <ReactKonva.Rect ref={(el) => (this.myRef = el)} />
       </ReactKonva.Layer>
     );
   }
 
+  /**
+   * Choose which helper visuals to render based on the current control mode.
+   */
   renderTouchHelpers() {
     if (this.stage === undefined) {
       return null;
@@ -97,6 +125,9 @@ class TouchScreen extends React.Component<Props> {
     return null;
   }
 
+  /**
+   * Visual helper for relative mode: a vertical guideline dividing left/right.
+   */
   renderLineHelper() {
     return (
       <ReactKonva.Line
@@ -106,12 +137,15 @@ class TouchScreen extends React.Component<Props> {
           this.stage.width() / 2,
           this.stage.height() / 4,
           this.stage.width() / 2,
-          (this.stage.height() / 4) * 3
+          (this.stage.height() / 4) * 3,
         ]}
       />
     );
   }
 
+  /**
+   * Visual helpers for absolute/arrow mode: draw four small arrows around center.
+   */
   renderArrowHelpers() {
     return (
       <ReactKonva.Group>
@@ -158,6 +192,10 @@ class TouchScreen extends React.Component<Props> {
     );
   }
 
+  /**
+   * Compute a direction from the current touch pointer and notify the parent
+   * if it differs from the queued `nextDirection`.
+   */
   directPlayer() {
     let dir = this.calculateDirectionForTouch(this.props.mode);
 
@@ -166,6 +204,9 @@ class TouchScreen extends React.Component<Props> {
     }
   }
 
+  /**
+   * Dispatch to the appropriate direction calculation strategy based on mode.
+   */
   calculateDirectionForTouch(mode: number): string {
     let pointerCoords = this.stage.getPointerPosition();
     if (pointerCoords === undefined) {
@@ -184,6 +225,11 @@ class TouchScreen extends React.Component<Props> {
     }
   }
 
+  /**
+   * Relative mode: a single tap shifts the current direction left/right depending
+   * on which half of the screen was touched. Subsequent immediate taps are
+   * ignored until the touch is released.
+   */
   calculateDirectionRelativeMode(pointerCoords: { x: number; y: number }) {
     if (!this.tapped) {
       this.tapped = true;
@@ -203,6 +249,10 @@ class TouchScreen extends React.Component<Props> {
     }
   }
 
+  /**
+   * Absolute mode: compute which quadrant (up/right/left/down) the touch lies in
+   * relative to screen center and return the corresponding direction.
+   */
   calculateDirectionAbsoluteMode(pointerCoords: { x: number; y: number }) {
     let dir = "none";
     let x = this.stage.width() / 2 - pointerCoords.x;
@@ -225,6 +275,10 @@ class TouchScreen extends React.Component<Props> {
     return dir;
   }
 
+  /**
+   * Following mode: compute direction based on the vector from touch point to
+   * the player position (touch-to-player), returning the primary cardinal direction.
+   */
   calculateDirectionFollowingMode(pointerCoords: { x: number; y: number }) {
     let pX =
       (this.props.playerCoords.X / this.props.dim.X) * this.stage.width();

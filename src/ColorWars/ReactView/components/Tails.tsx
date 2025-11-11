@@ -7,7 +7,7 @@ import {
   COLORS,
   layouter,
   COLOR_NUMS,
-  PointsAreEqual
+  PointsAreEqual,
 } from "../../utils/functions";
 
 export interface Props {
@@ -16,11 +16,23 @@ export interface Props {
   dimension: Point;
 }
 
+/**
+ * Tails
+ *
+ * Renders player 'tail' rectangles on a FastLayer. Uses prototypes for each
+ * player to clone and add new tail rectangles efficiently. The component avoids
+ * unnecessary re-renders and performs incremental updates (destroying/adding nodes)
+ * when the tails array changes.
+ */
 class Tails extends React.Component<Props, object> {
   layer: any;
   tailPrototypes: Rect[] = [];
   canvasDimension: Point = { X: 0, Y: 0 };
 
+  /**
+   * Prevent React re-render when tails and dimension references haven't changed.
+   * This keeps drawing fast by relying on manual canvas updates instead of JSX updates.
+   */
   shouldComponentUpdate(nextProps: Props) {
     if (
       nextProps.tails === this.props.tails &&
@@ -31,16 +43,25 @@ class Tails extends React.Component<Props, object> {
     return true;
   }
 
+  /**
+   * Render a Konva FastLayer and capture its ref for manual drawing operations.
+   */
   render() {
     return (
       <FastLayer
-        ref={c => {
+        ref={(c) => {
           this.layer = c;
         }}
       />
     );
   }
 
+  /**
+   * Prepare and apply incremental tail updates before the component updates.
+   * - Recreate prototypes if layout or player colors changed
+   * - Destroy tail nodes that shrank
+   * - Clone and add new tail nodes for newly extended tails
+   */
   componentWillUpdate(nextProps: Props) {
     let stage = this.layer.getStage() as Stage;
     let newCanvDim = { X: stage.width(), Y: stage.height() };
@@ -52,7 +73,8 @@ class Tails extends React.Component<Props, object> {
     );
     let nodesToDraw: Point[][] = this.calculateNodesToDraw(nextProps.tails);
 
-    tailsToDestroy.forEach(num => {
+    // Destroy any tail nodes that are no longer needed.
+    tailsToDestroy.forEach((num) => {
       let tail = this.layer.getChildren(
         (node: Node) => parseInt(node.name(), 10) === num
       );
@@ -61,6 +83,7 @@ class Tails extends React.Component<Props, object> {
       });
     });
 
+    // Add any newly required tail nodes by cloning prototypes and positioning them.
     for (let i = 0; i < nodesToDraw.length; i++) {
       if (nodesToDraw[i] === undefined) {
         continue;
@@ -74,15 +97,19 @@ class Tails extends React.Component<Props, object> {
 
         let clone = this.tailPrototypes[i].clone({
           x: X,
-          y: Y
+          y: Y,
         });
         this.layer.add(clone);
       }
     }
 
+    // Trigger a redraw of the layer to show added/removed nodes.
     this.layer.draw();
   }
 
+  /**
+   * Recreate prototypes when dimensions or player colors change.
+   */
   createPrototypesIfNecessary(nextProps: Props, canvDim: Point) {
     if (
       !PointsAreEqual(nextProps.dimension, this.props.dimension) ||
@@ -93,6 +120,9 @@ class Tails extends React.Component<Props, object> {
     }
   }
 
+  /**
+   * Check whether the players' colors changed compared to cached prototypes.
+   */
   colorsHasChanged(players: Player[]): boolean {
     for (let i = 0; i < players.length; i++) {
       if (this.tailPrototypes[i] === undefined) {
@@ -100,18 +130,23 @@ class Tails extends React.Component<Props, object> {
       }
 
       let color = this.tailPrototypes[i].fill();
-      if (players[i].color !== COLOR_NUMS[color]) {
+      // COLOR_NUMS is an object keyed by color names; the prototype.fill() returns
+      // a string key. Cast to any to satisfy TypeScript indexing here (no runtime change).
+      if (players[i].color !== (COLOR_NUMS as any)[color]) {
         return true;
       }
     }
     return false;
   }
 
+  /**
+   * Create cached Rect prototypes for each player to be cloned when drawing tails.
+   */
   createPrototypes(nextProps: Props, canvDim: Point) {
     let Width, Height;
     ({ Width, Height } = layouter(nextProps.dimension, canvDim, {
       X: 0,
-      Y: 0
+      Y: 0,
     }));
     for (let i = 0; i < nextProps.players.length; i++) {
       if (this.tailPrototypes[i] !== undefined) {
@@ -126,7 +161,7 @@ class Tails extends React.Component<Props, object> {
         shadowBlur: 3,
         opacity: 0.25,
         fill: color,
-        name: i.toString()
+        name: i.toString(),
       }) as any;
       sh.perfectDrawEnabled(false);
       sh.cache();
@@ -135,6 +170,9 @@ class Tails extends React.Component<Props, object> {
     }
   }
 
+  /**
+   * Determine which player tails shrank (so we can destroy their nodes).
+   */
   calculateTailsToDestroy(tails: Point[][]) {
     let ret = [];
     for (let i = 0; i < this.props.tails.length; i++) {
@@ -145,6 +183,9 @@ class Tails extends React.Component<Props, object> {
     return ret;
   }
 
+  /**
+   * Determine the new nodes that need to be drawn for each tail (only the appended portion).
+   */
   calculateNodesToDraw(tails: Point[][]) {
     let ret = [];
     for (let i = 0; i < this.props.tails.length; i++) {

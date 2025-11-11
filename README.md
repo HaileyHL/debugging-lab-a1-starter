@@ -6,20 +6,24 @@ The game rules are simple - try to paint as much territory as possible until tim
 
 ## Gameplay
 
-**ColorWars** can be played by up to 8 players. To enable more players, switch off "AI controlled" button in given player settings. The game has dynamic settings, so you can change every aspect of the game during the match. The aim of the game is to have more territory than other players when game ends. You can die by hitting edge of the screen, or when someone cuts your tail. When the death penalty is set to infinite or you don't have any territory left, you are eliminated from the game.
-**The game supports touchscreen control, so you can try it on your mobile device!**
+**ColorWars** can be played by up to 8 players. The game has dynamic settings, so you can change every aspect of the game during the match. The aim of the game is to have more territory than other players when game ends. You can die by hitting edge of the screen, or when someone cuts your tail. When the death penalty is set to infinite or you don't have any territory left, you are eliminated from the game.
 
 ![gameplay](https://github.com/mcalus3/color-wars-web/blob/master/resources/gameplay.gif)
+
+### To play:
+You are the green user (top left corner) on the screen. You can play by pressing WASD on the keyboard to move up, left, down, or right, respectively.
 
 ## CSE 110 - Bug Description
 
 ### To run:
 
 1. Wait until you see a message in the terminal along the lines of "Welcome to Codespaces! You are on a custom image defined in your devcontainer.json file."
-2. When the build finishes, run `npm start` to start the dev server. You should see the web app opening. GLHF : )
+2. When the build finishes, run `npm start` to start the dev server. You should see the web app opening!
 
 ### Task description:
 As shown in the video above, there are multiple players that compete in covering more space in there colors by making quadrilateral shapes. There is a bar that represents the proportion of the canvas the players have covered. However, this bar is currently not presenting the proportions correctly. Your task is to identify the code relevant to the bug, and attempt to find a fix.
+
+Hint: the bug should be a **logic error** in one of the core **TypeScript** files.
 
 ### To submit:
 Run the following commands line by line to commit and push all your changes (or use the sidebar):
